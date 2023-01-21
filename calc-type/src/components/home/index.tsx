@@ -1,45 +1,43 @@
 import {
-    Container,
-    ContainerForm,
-    DivInfo,
-    DivH2,
-    DivValor,
-    DivForm,
-    Venda,
-    Parcelas,
-    Mdr,
-    DivH1,
-  } from "./style";
-  import {toast } from 'react-toastify';
-  import 'react-toastify/dist/ReactToastify.css';
+  Container,
+  ContainerForm,
+  DivInfo,
+  DivH2,
+  DivValor,
+  DivForm,
+  Venda,
+  Parcelas,
+  Mdr,
+  DivH1,
+  Dias,
+} from "./style";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-  
-  
-  import { useForm } from "react-hook-form";
-  import { useEffect, useState } from "react";
-  import { api } from "../service/api";
+import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { api } from "../service/api";
 
-  
-  interface IdataCalc {
-    amount: number;
-    installments: number;
-    mdr: number;
-    days: number;
-    
-  }
-
-  interface IApiResponse {
-    key: {
-        [key: number]: number;
-    }
+interface IdataCalc {
+  amount: number;
+  installments: number;
+  mdr: number;
+  days: number;
 }
 
-  
-  const Home = () => {
-    const [apiResponse, setApiResponse] = useState<IApiResponse[]>([]);
-    const [diasResponse, setDiasResponse] = useState<IApiResponse[]>([]);
+interface IApiResponse {
+  key: {
+    [key: number]: number;
+  };
+}
 
-    const notiFy = (message: string) =>
+const Home = () => {
+  const [apiResponse, setApiResponse] = useState<IApiResponse[]>([]);
+  const [diasResponse, setDiasResponse] = useState<IApiResponse[]>([]);
+  const [showDiasResponse, setShowDiasResponse] = useState<boolean>(false);
+  console.log(showDiasResponse);
+
+  const notiFy = (message: string) =>
     toast(message, {
       position: "top-right",
       autoClose: 5000,
@@ -49,117 +47,136 @@ import {
       draggable: true,
       progress: undefined,
     });
-  
-    async function UsefetchAPI({
+
+  async function UsefetchAPI({ amount, installments, mdr, days }: IdataCalc) {
+    let data = {
       amount,
       installments,
       mdr,
-      days
-    }: IdataCalc) 
-
-
-    {
-
-      const data = {
+    };
+    let data2 = undefined;
+    if (days) {
+      data2 = {
+        days: [days],
         amount,
         installments,
         mdr,
-        days
-       
       };
-  
-     await api
-        .post("", data)
-        .then((response) => {
-          setApiResponse(response.data);
-          })
-        .catch((err) => {
-          if (err.response) {
-          if (err.response.status === 408) {
-            toast.error("Timeout", {type: "error"});         
+    }
+    // console.log("data:", data, "data2:", data2, "days:", days);
 
+    // const data2 = {
+    //   amount,
+    //   installments,
+    //   mdr,
+    //   days,
+    // };
+    const request = data2 !== undefined ? data2 : data;
+    await api
+      .post("", request)
+      .then((response) => {
+        setApiResponse(response.data);
+
+        if (days) {
+          setDiasResponse(response.data.days);
+          setShowDiasResponse(true);
+          console.log(response.data);
+        }
+      })
+      .catch((err) => {
+        if (err.response) {
+          if (err.response.status === 408) {
+            toast.error("Timeout", { type: "error" });
           } else if (err.response.status === 500) {
-            toast.error("Internal Server Error", {type: "error"});
+            toast.error("Internal Server Error", { type: "error" });
           }
           notiFy("Aguarde");
         }
       });
-    }
-    
-   
-   
-  
-    const { register, handleSubmit } = useForm<IdataCalc>();
-  
-    return (
-      <Container>
-        <ContainerForm>
-          <DivH1>
-            <h1>Simule sua Antecipação</h1>
-          </DivH1>
-          <div>
-            <form onSubmit={handleSubmit(UsefetchAPI)}>
-              <DivForm>
-                <Venda>
-                  <label htmlFor="amount"> Informe o valor da venda*</label>
+
+    // api
+    //   .post("", data2)
+    //   .then((resp) => {
+    //     setApiResponse(resp.data);
+    //     console.log(setApiResponse);
+    //   })
+    //   .catch((err) => {
+    //     console.error(err);
+    //   });
+  }
+
+  const { register, handleSubmit } = useForm<IdataCalc>();
+
+  return (
+    <Container>
+      <ContainerForm>
+        <DivH1>
+          <h1>Simule sua Antecipação</h1>
+        </DivH1>
+        <div>
+          <form onSubmit={handleSubmit(UsefetchAPI)}>
+            <DivForm>
+              <Venda>
+                <label htmlFor="amount"> Informe o valor da venda*</label>
+                <input type="number" id="amount" {...register("amount")} />
+              </Venda>
+              <Parcelas>
+                <label htmlFor="parcelas"> Em quantas parcelas*</label>
+                <div>
                   <input
                     type="number"
-                    id="amount"
-                    {...register("amount")}
+                    id="installments"
+                    {...register("installments")}
                   />
-                </Venda>
-                <Parcelas>
-                  <label htmlFor="parcelas"> Em quantas parcelas*</label>
-                  <div>
-                    <input
-                      type="number"
-                      id="installments"
-                      {...register("installments")}
-                    />
-                    <small>Máximo de 12 parcelas</small>
-                  </div>
-                </Parcelas>
-                <Mdr>
-                  <label htmlFor="mdr"> Informe o percentual de MDR</label>
-                  <input type="number" id="mdr" {...register("mdr")} />
-                </Mdr>
-                <label htmlFor="days">Passe a quantidade de dias se desejar.</label>
-                <input type="text" id="days"/>
+                  <small>Máximo de 12 parcelas</small>
+                </div>
+              </Parcelas>
+              <Mdr>
+                <label htmlFor="mdr"> Informe o percentual de MDR</label>
+                <input type="number" id="mdr" {...register("mdr")} />
+              </Mdr>
+              <Dias>
+                <label htmlFor="days"> Em quantos dias*</label>
+                <div>
+                  <input type="number" id="days" {...register("days")} />
+                
+                </div>
+              </Dias>
 
-                <button  type="submit"> Calcular</button>
-              </DivForm>
-            </form>
-          </div>
-        </ContainerForm>
-  
-        <DivInfo>
-          <DivH2>
-            <h2> Você receberá:</h2>
-          </DivH2>
-          
-          <DivValor>
-           
+              <button type="submit"> Calcular</button>
+            </DivForm>
+          </form>
+        </div>
+      </ContainerForm>
 
-            {Object.keys(apiResponse).map((key:any) =>
-    apiResponse[key] ? (
-        key > 1 ? 
-        <p>{`Em ${key} dias:` } 
-            <span> {`R$ ${apiResponse[key]}`}</span>
-           </p> : 
-        <p>{`Amanhã:`} 
-            <span>{`R$ ${apiResponse[key]}`}</span>
-        </p>
-        
-    ) : null
-)}
+      <DivInfo>
+        <DivH2>
+          <h2> Você receberá:</h2>
+        </DivH2>
 
-
-            
-          </DivValor>
-
-        </DivInfo>
-      </Container>
-    );
-  };
-  export default Home;
-  
+        <DivValor>
+          {apiResponse &&
+            Object.keys(apiResponse).map((key: any) =>
+              apiResponse[key] ? (
+                <p key={key}>
+                  {key > 1 ? `Em ${key} dias:` : "Amanhã:"}
+                  <span> {`R$ ${apiResponse[key]}`}</span>
+                </p>
+              ) : null
+            )}
+          {showDiasResponse &&
+            diasResponse &&
+            Object.keys(diasResponse).map((key: any) =>
+              diasResponse[key] ? (
+                <p key={key}>
+                  {`Em ${key} dias:`}
+                  <span>{`R$ ${diasResponse[key]}`}</span>
+                </p>
+              ) : null
+            )}
+        </DivValor>
+      </DivInfo>
+    </Container>
+  );
+};
+export default Home;

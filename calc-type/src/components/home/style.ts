@@ -12,7 +12,7 @@ export const Container = styled.div`
   border-radius: 15px;
 
   width: 680px;
-  height: 389px;
+  height: 500px; //389
   font-family: 'Source Sans Pro';
   h1{
     color:#656565;
@@ -20,8 +20,15 @@ export const Container = styled.div`
     line-height: 28.13px;
    
   }
+  input{
+    width: 251px;
+    height: 37px;
+    border-radius: 4px;
+    outline: 0;
+  }
   input:focus{
     border: 1px solid #66AFE9;
+    
 
   }
   label{
@@ -36,9 +43,9 @@ export const ContainerForm = styled.div`
     display: flex;
     flex-direction: column;
 
-    width: 297px;
+     width: 300px;
 
-    height: 300px;
+    /* height: 300px;  */
     /* gap: 78px; */
 
     button {
@@ -64,25 +71,20 @@ display: flex;
     flex-direction: column;
     align-items: center;
     gap: 32px;
+    /* height: 500px; */
 `;
 export const Venda = styled.div`
   input {
     /* border: ridge; */
     border: 1px solid #dde6e9;
-    width: 251px;
-    height: 37px;
-    border-radius: 4px;
-    outline: 0;
+    
   }
 `;
 export const Parcelas = styled.div`
   input {
     /* border: ridge; */
     border: 1px solid #DDE6E9;
-    width: 251px;
-    height: 37px;
-    border-radius: 4px;
-    outline: 0;
+  
   }
   div{
     display: flex;
@@ -97,17 +99,29 @@ export const Mdr = styled.div`
   input {
     /* border: ridge; */
     border: 1px solid #dde6e9;
-    width: 251px;
-    height: 37px;
-    border-radius: 4px;
-    outline: 0;
+    
   }
 `;
+export const Dias=styled.div`
+ input {
+    /* border: ridge; */
+    border: 1px solid #dde6e9;
+    
+  }
+`
+// export const BotãoTeste=styled.div`
+// button{
+//   position: relative;
+//     left: 128px;
+
+// }
+
+// ` 
 
 export const DivInfo = styled.div`
   border: solid 1px #d9d9d9;
   width: 231px;
-  height: 389px;
+  height: 500px;
   border-radius: 0 15px 15px 0;
   background-color: #80808024;
   position: relative;
